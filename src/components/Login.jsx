@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
-import {useHistory} from 'react-router-dom'
 
-const LoginForm = ({ onSwitchToSignup }) => {
+const LoginForm = ({ onSwitchToSignup,onLoginSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const history=useHistory();
 
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
             // Login logic for user
             const response = await axios.get(`http://localhost:3000/login/user/${email}/${password}`);
-            localStorage.setItem('ispremium', response.data.ispremium);
+            localStorage.setItem('user', response.data.email);
             localStorage.setItem('token', response.data.token);
-            window.location.href = 'welcome.html';
+           // window.location.href = 'welcome.html';
         } catch (error) {
             setErrorMessage('Invalid Credentials!');
         }
@@ -33,7 +31,8 @@ const LoginForm = ({ onSwitchToSignup }) => {
         axios.post('http://localhost:3001/google-oauth/verify-token', { token: response.credential })
             .then((res) => {
                 localStorage.setItem('token', res.data.email);
-                history.push('/admin'); 
+                //history.push('/admin'); 
+                onLoginSuccess();
             })
             .catch((error) => {
                 console.log(response.credential);
